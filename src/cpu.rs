@@ -241,6 +241,11 @@ impl CPU {
         self.update_zero_and_negative_flags(self.register_x);
     }
 
+    fn txa(&mut self) {
+        self.register_a = self.register_x;
+        self.update_zero_and_negative_flags(self.register_a);
+    }
+
     fn inx(&mut self) {
         self.register_x = self.register_x.wrapping_add(1);
         self.update_zero_and_negative_flags(self.register_x);
@@ -309,6 +314,7 @@ impl CPU {
                 }
 
                 0xAA => self.tax(),
+                0x8a => self.txa(),
                 0xe8 => self.inx(),
                 0x00 => return,
                 _ => todo!(),
