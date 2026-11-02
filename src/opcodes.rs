@@ -27,6 +27,7 @@ lazy_static! {
         OpCode::new(0xaa, "TAX", 1, 2, AddressingMode::NoneAddressing),
         OpCode::new(0xe8, "INX", 1, 2, AddressingMode::NoneAddressing),
         OpCode::new(0x8a, "TXA", 1, 2, AddressingMode::NoneAddressing),
+        OpCode::new(0xca, "DEX", 1, 2, AddressingMode::NoneAddressing),
 
         OpCode::new(0x69, "ADC", 2, 2, AddressingMode::Immediate),
         OpCode::new(0x65, "ADC", 2, 3, AddressingMode::ZeroPage),

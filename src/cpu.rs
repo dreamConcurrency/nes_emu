@@ -251,6 +251,11 @@ impl CPU {
         self.update_zero_and_negative_flags(self.register_x);
     }
 
+    fn dex(&mut self) {
+        self.register_x = self.register_x.wrapping_sub(1);
+        self.update_zero_and_negative_flags(self.register_x);
+    }
+
     fn update_zero_and_negative_flags(&mut self, result: u8) {
         if result == 0 {
             self.status.insert(CpuFlags::ZERO);
@@ -316,6 +321,7 @@ impl CPU {
                 0xAA => self.tax(),
                 0x8a => self.txa(),
                 0xe8 => self.inx(),
+                0xca => self.dex(),
                 0x00 => return,
                 _ => todo!(),
             }
