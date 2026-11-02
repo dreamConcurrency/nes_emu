@@ -197,6 +197,12 @@ impl CPU {
         self.add_to_register_a(value);
     }
 
+    fn and(&mut self, mode: &AddressingMode) {
+        let addr = self.get_operand_adress(mode);
+        let data = self.mem_read(addr);
+        self.set_register_a(data & self.register_a);
+    }
+
     fn lda(&mut self, mode: &AddressingMode) {
         let addr = self.get_operand_adress(&mode);
         let value = self.mem_read(addr);
@@ -324,6 +330,10 @@ impl CPU {
                 /* ADC */
                 0x69 | 0x65 | 0x75 | 0x6d | 0x7d | 0x79 | 0x61 | 0x71 => {
                     self.adc(&opcode.mode);
+                }
+
+                0x29 | 0x25 | 0x35 | 0x2d | 0x3d | 0x39 | 0x21 | 0x31 => {
+                    self.and(&opcode.mode);
                 }
 
                 /* LDA */
