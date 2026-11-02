@@ -256,6 +256,16 @@ impl CPU {
         self.update_zero_and_negative_flags(self.register_x);
     }
 
+    fn tay(&mut self) {
+        self.register_a = self.register_y;
+        self.update_zero_and_negative_flags(self.register_a);
+    }
+
+    fn tya(&mut self) {
+        self.register_y = self.register_a;
+        self.update_zero_and_negative_flags(self.register_y);
+    } 
+
     fn update_zero_and_negative_flags(&mut self, result: u8) {
         if result == 0 {
             self.status.insert(CpuFlags::ZERO);
@@ -322,6 +332,8 @@ impl CPU {
                 0x8a => self.txa(),
                 0xe8 => self.inx(),
                 0xca => self.dex(),
+                0xa8 => self.tay(),
+                0x98 => self.tya(),
                 0x00 => return,
                 _ => todo!(),
             }
