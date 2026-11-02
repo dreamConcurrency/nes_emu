@@ -285,6 +285,15 @@ impl CPU {
         data
     }
 
+    fn dec(&mut self, mode: &AddressingMode) -> u8 {
+        let addr = self.get_operand_adress(mode);
+        let mut data = self.mem_read(addr);
+        data = data.wrapping_sub(1);
+        self.mem_write(addr, data);
+        self.update_zero_and_negative_flags(data);
+        data
+    }
+
     fn update_zero_and_negative_flags(&mut self, result: u8) {
         if result == 0 {
             self.status.insert(CpuFlags::ZERO);
@@ -350,6 +359,10 @@ impl CPU {
                 /* INC */
                 0xe6 | 0xf6 | 0xee | 0xfe => {
                     self.inc(&opcode.mode);
+                }
+
+                0xc6 | 0xd6 | 0xce | 0xde => {
+                    self.dec(&opcode.mode);
                 }
 
                 0xAA => self.tax(),

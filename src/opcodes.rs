@@ -84,6 +84,11 @@ lazy_static! {
         OpCode::new(0xee, "INC", 3, 6, AddressingMode::Absolute),
         OpCode::new(0xfe, "INC", 3, 7, AddressingMode::Absolute_X), 
 
+        OpCode::new(0xc6, "DEC", 2, 5, AddressingMode::ZeroPage),
+        OpCode::new(0xd6, "DEC", 2, 6, AddressingMode::ZeroPage_X),
+        OpCode::new(0xce, "DEC", 3, 6, AddressingMode::Absolute),
+        OpCode::new(0xde, "DEC", 3, 7, AddressingMode::Absolute_X),
+
     ];
 
     pub static ref OPCODES_MAP: HashMap<u8, &'static OpCode> = {
