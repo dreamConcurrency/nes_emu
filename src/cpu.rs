@@ -276,6 +276,15 @@ impl CPU {
         self.update_zero_and_negative_flags(self.register_y);
     }
 
+    fn inc(&mut self, mode: &AddressingMode) -> u8 {
+        let addr = self.get_operand_adress(mode);
+        let mut data = self.mem_read(addr);
+        data = data.wrapping_add(1);
+        self.mem_write(addr, data);
+        self.update_zero_and_negative_flags(data);
+        data
+    }
+
     fn update_zero_and_negative_flags(&mut self, result: u8) {
         if result == 0 {
             self.status.insert(CpuFlags::ZERO);
@@ -336,6 +345,11 @@ impl CPU {
                 /* STY */
                 0x84 | 0x94 | 0x8c => {
                     self.sty(&opcode.mode);
+                }
+
+                /* INC */
+                0xe6 | 0xf6 | 0xee | 0xfe => {
+                    self.inc(&opcode.mode);
                 }
 
                 0xAA => self.tax(),
