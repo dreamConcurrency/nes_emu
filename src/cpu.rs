@@ -266,6 +266,16 @@ impl CPU {
         self.update_zero_and_negative_flags(self.register_y);
     } 
 
+    fn dey(&mut self) {
+        self.register_y = self.register_y.wrapping_sub(1);
+        self.update_zero_and_negative_flags(self.register_y);
+    } 
+
+    fn iny(&mut self) {
+        self.register_y = self.register_y.wrapping_add(1);
+        self.update_zero_and_negative_flags(self.register_y);
+    }
+
     fn update_zero_and_negative_flags(&mut self, result: u8) {
         if result == 0 {
             self.status.insert(CpuFlags::ZERO);
@@ -333,7 +343,8 @@ impl CPU {
                 0xe8 => self.inx(),
                 0xca => self.dex(),
                 0xa8 => self.tay(),
-                0x98 => self.tya(),
+                0x88 => self.dey(),
+                0xc8 => self.iny(),
                 0x00 => return,
                 _ => todo!(),
             }

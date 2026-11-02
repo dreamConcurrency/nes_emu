@@ -30,6 +30,8 @@ lazy_static! {
         OpCode::new(0xca, "DEX", 1, 2, AddressingMode::NoneAddressing),
         OpCode::new(0xa8, "TAY", 1, 2, AddressingMode::NoneAddressing),
         OpCode::new(0x98, "TYA", 1, 2, AddressingMode::NoneAddressing),
+        OpCode::new(0x88, "DEY", 1, 2, AddressingMode::NoneAddressing),
+        OpCode::new(0xc8, "INY", 1, 2, AddressingMode::NoneAddressing),
 
         OpCode::new(0x69, "ADC", 2, 2, AddressingMode::Immediate),
         OpCode::new(0x65, "ADC", 2, 3, AddressingMode::ZeroPage),
