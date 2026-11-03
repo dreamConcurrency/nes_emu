@@ -191,6 +191,43 @@ impl CPU {
         self.set_register_a(result);
     }
 
+    fn set_carry_flag(&mut self) {
+        self.status.insert(CpuFlags::CARRY);
+    }
+
+    fn clear_carry_flag(&mut self) {
+        self.status.remove(CpuFlags::CARRY);
+    }
+
+    fn asl_accumulator(&mut self) {
+        let mut data = self.register_a;
+
+        if data >> 7 == 1 {
+            self.set_carry_flag();
+        } else {
+            self.clear_carry_flag();
+        }
+
+        data = data << 1;
+        self.set_register_a(data)
+    }
+
+    fn asl(&mut self, mode: &AddressingMode) -> u8 {
+        let addr = self.get_operand_adress(mode);
+        let data = self.mem_read(addr);
+
+        if data >> 7 == 1 {
+            self.set_carry_flag();
+        } else {
+            self.clear_carry_flag();
+        }
+
+        data = data << 1;
+        self.mem_write(addr, data);
+        self.update_zero_and_negative_flags(data);
+        data
+    }
+
     fn adc(&mut self, mode: &AddressingMode) {
         let addr = self.get_operand_adress(&mode);
         let value = self.mem_read(addr);
@@ -425,6 +462,13 @@ impl CPU {
                 /* CPY */
                 0xc0 | 0xc4 | 0xcc => {
                     self.compare(&opcode.mode, self.register_y);
+                }
+
+                /* ASL */
+                0x0a => self.asl_accumulator(),
+
+                0x06 | 0x16 | 0x0e | 0x1e => {
+                    self.asl(&opcode.mode);
                 }
 
                 0xAA => self.tax(),
