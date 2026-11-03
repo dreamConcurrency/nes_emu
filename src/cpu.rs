@@ -312,6 +312,19 @@ impl CPU {
         data
     }
 
+    fn compare(&mut self, mode: &AddressingMode, compare_with: u8) {
+        let addr = self.get_operand_adress(mode);
+        let data = self.mem_read(addr);
+
+        if data <= compare_with {
+            self.status.insert(CpuFlags::CARRY);
+        } else {
+            self.status.remove(CpuFlags::CARRY);
+        }
+
+        self.update_zero_and_negative_flags(compare_with.wrapping_sub(data));
+    }
+
     fn update_zero_and_negative_flags(&mut self, result: u8) {
         if result == 0 {
             self.status.insert(CpuFlags::ZERO);
@@ -397,6 +410,11 @@ impl CPU {
                 /* DEC */
                 0xc6 | 0xd6 | 0xce | 0xde => {
                     self.dec(&opcode.mode);
+                }
+
+                /* CMP */
+                0xc9 | 0xc5 | 0xd5 | 0xcd | 0xdd | 0xd9 | 0xc1 | 0xd1 => {
+                    self.compare(&opcode.mode, self.register_a);
                 }
 
                 0xAA => self.tax(),

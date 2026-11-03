@@ -116,6 +116,15 @@ lazy_static! {
         OpCode::new(0xce, "DEC", 3, 6, AddressingMode::Absolute),
         OpCode::new(0xde, "DEC", 3, 7, AddressingMode::Absolute_X),
 
+        OpCode::new(0xc9, "CMP", 2, 2, AddressingMode::Immediate),
+        OpCode::new(0xc5, "CMP", 2, 3, AddressingMode::ZeroPage),
+        OpCode::new(0xd5, "CMP", 2, 4, AddressingMode::ZeroPage_X),
+        OpCode::new(0xcd, "CMP", 3, 4, AddressingMode::Absolute),
+        OpCode::new(0xdd, "CMP", 3, 4, AddressingMode::Absolute_X),
+        OpCode::new(0xd9, "CMP", 3, 4, AddressingMode::Absolute_Y),
+        OpCode::new(0xc1, "CMP", 2, 6, AddressingMode::Indirect_X),
+        OpCode::new(0xd1, "CMP", 2, 5, AddressingMode::Indirect_Y),
+
     ];
 
     pub static ref OPCODES_MAP: HashMap<u8, &'static OpCode> = {
