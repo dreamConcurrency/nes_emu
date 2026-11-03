@@ -138,7 +138,7 @@ impl CPU {
 
     pub fn load_and_run(&mut self, program: Vec<u8>) {
         self.load(program);
-        self.reset();
+        self.program_counter = self.mem_read_u16(0xFFFC);
         self.run()
     }
 
@@ -152,7 +152,7 @@ impl CPU {
         self.register_x = 0;
         self.register_y = 0;
         self.status = CpuFlags::from_bits_truncate(0b100100);
-      
+
         self.program_counter = self.mem_read_u16(0xFFFC);
     }
 
@@ -160,8 +160,6 @@ impl CPU {
         self.register_a = value;
         self.update_zero_and_negative_flags(self.register_a);
     }
-
-
 
     fn add_to_register_a(&mut self, data: u8) {
         let sum = self.register_a as u16
@@ -214,7 +212,7 @@ impl CPU {
 
     fn asl(&mut self, mode: &AddressingMode) -> u8 {
         let addr = self.get_operand_adress(mode);
-        let data = self.mem_read(addr);
+        let mut data = self.mem_read(addr);
 
         if data >> 7 == 1 {
             self.set_carry_flag();
@@ -284,7 +282,7 @@ impl CPU {
     fn stx(&mut self, mode: &AddressingMode) {
         let addr = self.get_operand_adress(mode);
         self.mem_write(addr, self.register_x);
-    } 
+    }
 
     fn sty(&mut self, mode: &AddressingMode) {
         let addr = self.get_operand_adress(mode);
@@ -319,12 +317,12 @@ impl CPU {
     fn tya(&mut self) {
         self.register_y = self.register_a;
         self.update_zero_and_negative_flags(self.register_y);
-    } 
+    }
 
     fn dey(&mut self) {
         self.register_y = self.register_y.wrapping_sub(1);
         self.update_zero_and_negative_flags(self.register_y);
-    } 
+    }
 
     fn iny(&mut self) {
         self.register_y = self.register_y.wrapping_add(1);
@@ -428,7 +426,7 @@ impl CPU {
                 0x85 | 0x95 | 0x8d | 0x9d | 0x99 | 0x81 | 0x91 => {
                     self.sta(&opcode.mode);
                 }
-                
+
                 /* STX */
                 0x86 | 0x96 | 0x8e => {
                     self.stx(&opcode.mode);
@@ -443,7 +441,7 @@ impl CPU {
                 0xe6 | 0xf6 | 0xee | 0xfe => {
                     self.inc(&opcode.mode);
                 }
-                
+
                 /* DEC */
                 0xc6 | 0xd6 | 0xce | 0xde => {
                     self.dec(&opcode.mode);
@@ -489,3 +487,4 @@ impl CPU {
         }
     }
 }
+

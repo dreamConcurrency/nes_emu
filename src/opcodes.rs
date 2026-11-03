@@ -1,4 +1,4 @@
-use crate::cpu::AddressingMode::{self, Absolute};
+use crate::cpu::AddressingMode;
 use std::collections::HashMap;
 
 pub struct OpCode {
