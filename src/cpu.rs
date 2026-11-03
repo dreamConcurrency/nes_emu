@@ -203,6 +203,12 @@ impl CPU {
         self.set_register_a(data & self.register_a);
     }
 
+    fn eor(&mut self, mode: &AddressingMode) {
+        let addr = self.get_operand_adress(mode);
+        let data = self.mem_read(addr);
+        self.set_register_a(data ^ self.register_a);
+    }
+
     fn lda(&mut self, mode: &AddressingMode) {
         let addr = self.get_operand_adress(&mode);
         let value = self.mem_read(addr);
@@ -332,8 +338,14 @@ impl CPU {
                     self.adc(&opcode.mode);
                 }
 
+                /* AND */
                 0x29 | 0x25 | 0x35 | 0x2d | 0x3d | 0x39 | 0x21 | 0x31 => {
                     self.and(&opcode.mode);
+                }
+
+                /* EOR */
+                0x49 | 0x45 | 0x55 | 0x4d | 0x5d | 0x59 | 0x41 | 0x51 => {
+                    self.eor(&opcode.mode);
                 }
 
                 /* LDA */
@@ -370,7 +382,8 @@ impl CPU {
                 0xe6 | 0xf6 | 0xee | 0xfe => {
                     self.inc(&opcode.mode);
                 }
-
+                
+                /* DEC */
                 0xc6 | 0xd6 | 0xce | 0xde => {
                     self.dec(&opcode.mode);
                 }
@@ -380,6 +393,7 @@ impl CPU {
                 0xe8 => self.inx(),
                 0xca => self.dex(),
                 0xa8 => self.tay(),
+                0x98 => self.tya(),
                 0x88 => self.dey(),
                 0xc8 => self.iny(),
                 0x00 => return,
