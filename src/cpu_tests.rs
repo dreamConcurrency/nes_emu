@@ -1,5 +1,6 @@
 use super::cpu::CPU;
 
+/* TAX */
 #[test]
 fn test_tax() {
     let mut cpu = CPU::new();
@@ -30,6 +31,7 @@ fn test_tax_negative_flag() {
     assert!(cpu.status.bits() & 0b1000_0000 != 0);
 }
 
+/* TXA */
 #[test]
 fn test_txa() {
     let mut cpu = CPU::new();
@@ -60,6 +62,7 @@ fn test_txa_negative_flag() {
     assert!(cpu.status.bits() & 0b1000_0000 != 0);
 }
 
+/* TAY */
 #[test]
 fn test_tay() {
     let mut cpu = CPU::new();
@@ -89,6 +92,7 @@ fn test_tay_negative_flag() {
     assert!(cpu.status.bits() & 0b1000_0000 != 0);
 }
 
+/* TYA */
 #[test]
 fn test_tya() {
     let mut cpu = CPU::new();
@@ -118,6 +122,7 @@ fn test_tya_negative_flag() {
     assert!(cpu.status.bits() & 0b1000_0000 != 0);
 }
 
+/* DEY */
 #[test]
 fn test_dey() {
     let mut cpu = CPU::new();
@@ -147,6 +152,7 @@ fn test_dey_negative_flag() {
     assert!(cpu.status.bits() & 0b1000_0000 != 0);
 }
 
+/* INY */
 #[test]
 fn test_iny() {
     let mut cpu = CPU::new();
@@ -175,3 +181,65 @@ fn test_iny_negative_flag() {
     assert_eq!(cpu.register_y, 128);
     assert!(cpu.status.bits() & 0b1000_0000 != 0);
 }
+
+/* DEX */
+#[test]
+fn test_dex() {
+    let mut cpu = CPU::new();
+    cpu.register_x = 1;
+
+    cpu.load_and_run(vec![0xca, 0x00]);
+    assert_eq!(cpu.register_x, 0);
+}
+
+#[test]
+fn test_dex_zero_flag() {
+    let mut cpu = CPU::new();
+    cpu.register_x = 1;
+
+    cpu.load_and_run(vec![0xca, 0x00]);
+    assert_eq!(cpu.register_x, 0);
+    assert!(cpu.status.bits() & 0b0000_0010 != 0);
+}
+
+#[test]
+fn test_dex_negative_flag() {
+    let mut cpu = CPU::new();
+    cpu.register_x = 129;
+
+    cpu.load_and_run(vec![0xca, 0x00]);
+    assert_eq!(cpu.register_x, 128);
+    assert!(cpu.status.bits() & 0b1000_0000 != 0);
+}
+
+/* INX */ 
+#[test]
+fn test_inx() {
+    let mut cpu = CPU::new();
+    cpu.register_x = 1;
+
+    cpu.load_and_run(vec![0xe8, 0x00]);
+    assert_eq!(cpu.register_x, 2);
+}
+
+#[test]
+fn test_inx_zero_flag_overflow() {
+    let mut cpu = CPU::new();
+    cpu.register_x = 255;
+
+    cpu.load_and_run(vec![0xe8, 0x00]);
+    assert_eq!(cpu.register_x, 0);
+    assert!(cpu.status.bits() & 0b0000_0010 != 0);
+}
+
+#[test]
+fn test_inx_negative_flag() {
+    let mut cpu = CPU::new();
+    cpu.register_x = 127;
+
+    cpu.load_and_run(vec![0xe8, 0x00]);
+    assert_eq!(cpu.register_x, 128);
+    assert!(cpu.status.bits() & 0b1000_0000 != 0);
+}
+
+
