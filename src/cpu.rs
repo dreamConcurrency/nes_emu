@@ -419,12 +419,12 @@ impl CPU {
     }
 
     fn tay(&mut self) {
-        self.register_a = self.register_y;
+        self.register_y = self.register_a;
         self.update_zero_and_negative_flags(self.register_a);
     }
 
     fn tya(&mut self) {
-        self.register_y = self.register_a;
+        self.register_a = self.register_y;
         self.update_zero_and_negative_flags(self.register_y);
     }
 
