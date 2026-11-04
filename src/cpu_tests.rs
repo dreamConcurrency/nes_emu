@@ -1,4 +1,4 @@
-use super::cpu::CPU;
+use super::cpu:: {CPU, Mem };
 
 /* TAX */
 #[test]
@@ -242,4 +242,41 @@ fn test_inx_negative_flag() {
     assert!(cpu.status.bits() & 0b1000_0000 != 0);
 }
 
+/* STA */ 
+#[test]
+fn test_sta_0x85() {
+    let mut cpu = CPU::new();
+    cpu.register_a = 10;
 
+    cpu.load_and_run(vec![0x85, 0x50, 0x00]);
+    assert_eq!(cpu.mem_read(0x0050), 10);
+}
+
+#[test]
+fn test_sta_0x95() {
+    let mut cpu = CPU::new();
+    cpu.register_a = 10;
+    cpu.register_x = 5;
+
+    cpu.load_and_run(vec![0x95, 0x50, 0x00]);
+    assert_eq!(cpu.mem_read(0x0055), 10);
+}
+
+#[test]
+fn test_sta_0x8d() {
+    let mut cpu = CPU::new();
+    cpu.register_a = 10;
+
+    cpu.load_and_run(vec![0x8d, 0x50, 0x00, 0x00]);
+    assert_eq!(cpu.mem_read(0x0050), 10);
+}
+
+#[test]
+fn test_sta_0x9d() {
+    let mut cpu = CPU::new();
+    cpu.register_a = 10;
+    cpu.register_x = 5;
+
+    cpu.load_and_run(vec![0x9d, 0x40, 0x00, 0x00]);
+    assert_eq!(cpu.mem_read(0x0045), 10);
+}

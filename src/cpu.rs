@@ -38,7 +38,7 @@ pub enum AddressingMode {
     NoneAddressing,
 }
 
-trait Mem {
+pub trait Mem {
     fn mem_read(&self, addr: u16) -> u8;
 
     fn mem_write(&mut self, addr: u16, data: u8);
@@ -246,7 +246,7 @@ impl CPU {
         if data & 1 == 1 {
             self.set_carry_flag();
         } else {
-            self.clear_carry_flag();
+    self.clear_carry_flag();
         }
 
         data = data >> 1;
