@@ -32,6 +32,14 @@ lazy_static! {
         OpCode::new(0x98, "TYA", 1, 2, AddressingMode::NoneAddressing),
         OpCode::new(0x88, "DEY", 1, 2, AddressingMode::NoneAddressing),
         OpCode::new(0xc8, "INY", 1, 2, AddressingMode::NoneAddressing),
+        OpCode::new(0x18, "CLC", 1, 2, AddressingMode::NoneAddressing),
+        OpCode::new(0x38, "SEC", 1, 2, AddressingMode::NoneAddressing),
+        OpCode::new(0x58, "CLI", 1, 2, AddressingMode::NoneAddressing),
+        OpCode::new(0x78, "SEI", 1, 2, AddressingMode::NoneAddressing),
+        OpCode::new(0xb8, "CLV", 1, 2, AddressingMode::NoneAddressing),
+        OpCode::new(0xd8, "CLD", 1, 2, AddressingMode::NoneAddressing),
+        OpCode::new(0xf8, "SED", 1, 2, AddressingMode::NoneAddressing),
+
 
         OpCode::new(0x69, "ADC", 2, 2, AddressingMode::Immediate),
         OpCode::new(0x65, "ADC", 2, 3, AddressingMode::ZeroPage),

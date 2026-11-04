@@ -325,7 +325,7 @@ impl CPU {
             self.clear_carry_flag();
         }
 
-        data = dara >> 1;
+        data = data >> 1;
 
         if old_carry {
             data = data | 0b10000000;
@@ -500,6 +500,27 @@ impl CPU {
                 0x69 | 0x65 | 0x75 | 0x6d | 0x7d | 0x79 | 0x61 | 0x71 => {
                     self.adc(&opcode.mode);
                 }
+
+                /* CLC */ 
+                0x18 => self.clear_carry_flag(),
+
+                /* SEC */ 
+                0x38 => self.set_carry_flag(),
+
+                /* CLI */ 
+                0x58 => self.status.remove(CpuFlags::INTERRUPT_DISABLE),
+
+                /* SEI */ 
+                0x78 => self.status.insert(CpuFlags::INTERRUPT_DISABLE),
+                
+                /* CLV */ 
+                0xb8 => self.status.remove(CpuFlags::OVERFLOW),
+
+                /* CLD */ 
+                0xd8 => self.status.remove(CpuFlags::DECIMAL_MODE),
+
+                /* SED */ 
+                0xf8 => self.status.insert(CpuFlags::DECIMAL_MODE),
 
                 /* AND */
                 0x29 | 0x25 | 0x35 | 0x2d | 0x3d | 0x39 | 0x21 | 0x31 => {
