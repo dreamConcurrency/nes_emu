@@ -226,6 +226,35 @@ impl CPU {
         data
     }
 
+    fn lsr_accumulator(&mut self) {
+        let mut data = self.register_a;
+
+        if data & 1 == 1 {
+            self.set_carry_flag();
+        } else {
+            self.clear_carry_flag();
+        }
+
+        data = data >> 1;
+        self.set_register_a(data);
+    }
+
+    fn lsr(&mut self, mode: &AddressingMode) -> u8 {
+        let addr = self.get_operand_adress(mode);
+        let mut data = self.mem_read(addr);
+
+        if data & 1 == 1 {
+            self.set_carry_flag();
+        } else {
+            self.clear_carry_flag();
+        }
+
+        data = data >> 1;
+        self.mem_write(addr, data);
+        self.update_zero_and_negative_flags(data);
+        data
+    }
+
     fn adc(&mut self, mode: &AddressingMode) {
         let addr = self.get_operand_adress(&mode);
         let value = self.mem_read(addr);
@@ -469,6 +498,13 @@ impl CPU {
                     self.asl(&opcode.mode);
                 }
 
+                /* LSR */
+                0x4a => self.lsr_accumulator(),
+
+                0x46 | 0x56 | 0x4e | 0x5e => {
+                    self.lsr(&opcode.mode);
+                }
+
                 0xAA => self.tax(),
                 0x8a => self.txa(),
                 0xe8 => self.inx(),
@@ -487,4 +523,3 @@ impl CPU {
         }
     }
 }
-
