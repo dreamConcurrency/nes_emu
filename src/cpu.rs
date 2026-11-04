@@ -255,6 +255,46 @@ impl CPU {
         data
     }
 
+    fn rol_accumulator(&mut self) {
+        let mut data = self.register_a;
+        let old_carry = self.status.contains(CpuFlags::CARRY);
+
+        if data >> 7 == 1 {
+            self.set_carry_flag();
+        } else {
+            self.clear_carry_flag();
+        }
+
+        data = data << 1;
+
+        if old_carry {
+            data = data | 1;
+        }
+
+        self.set_register_a(data);
+    }
+
+    fn rol(&mut self, mode: &AddressingMode) -> u8 {
+        let addr = self.get_operand_adress(mode);
+        let mut data = self.mem_read(addr);
+        let old_carry = self.status.contains(CpuFlags::CARRY);
+
+        if data >> 7 == 1 {
+            self.set_carry_flag();
+        } else {
+            self.clear_carry_flag();
+        }
+
+        data = data << 1;
+
+        if old_carry {
+            data = data | 1;
+        }
+        self.mem_write(addr, data);
+        self.update_zero_and_negative_flags(data);
+        data
+    }
+
     fn adc(&mut self, mode: &AddressingMode) {
         let addr = self.get_operand_adress(&mode);
         let value = self.mem_read(addr);
@@ -503,6 +543,13 @@ impl CPU {
 
                 0x46 | 0x56 | 0x4e | 0x5e => {
                     self.lsr(&opcode.mode);
+                }
+
+                /* ROL */ 
+                0x2a => self.rol_accumulator(),
+
+                0x26 | 0x36 | 0x2e | 0x3e => {
+                    self.rol(&opcode.mode);
                 }
 
                 0xAA => self.tax(),
