@@ -316,3 +316,32 @@ fn test_sta_0x91() {
     cpu.load_and_run(vec![0x91, 0x20, 0x00]);
     assert_eq!(cpu.mem_read(0x0105), 10);
 }
+
+/* STX */
+#[test]
+fn test_stx_0x86() {
+    let mut cpu = CPU::new();
+    cpu.register_x = 10;
+
+    cpu.load_and_run(vec![0x86, 0x50, 0x00]);
+    assert_eq!(cpu.mem_read(0x0050), 10);
+}
+
+#[test]
+fn test_stx_0x96() {
+    let mut cpu = CPU::new();
+    cpu.register_x = 10;
+    cpu.register_y = 5;
+
+    cpu.load_and_run(vec![0x96, 0x50, 0x00]);
+    assert_eq!(cpu.mem_read(0x0055), 10);
+}
+
+#[test]
+fn test_stx_0x8e() {
+    let mut cpu = CPU::new();
+    cpu.register_x = 10;
+
+    cpu.load_and_run(vec![0x8e, 0x00, 0x10, 0x00]);
+    assert_eq!(cpu.mem_read(0x1000), 10);
+}
