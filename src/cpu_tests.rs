@@ -345,3 +345,32 @@ fn test_stx_0x8e() {
     cpu.load_and_run(vec![0x8e, 0x00, 0x10, 0x00]);
     assert_eq!(cpu.mem_read(0x1000), 10);
 }
+
+/* STY */ 
+#[test]
+fn test_sty_0x84() {
+   let mut cpu = CPU::new();
+   cpu.register_y = 10;
+
+   cpu.load_and_run(vec![0x84, 0x50, 0x00]);
+   assert_eq!(cpu.mem_read(0x0050), 10);
+}
+
+#[test]
+fn test_sty_0x94() {
+    let mut cpu = CPU::new();
+    cpu.register_y = 10;
+    cpu.register_x = 7;
+
+    cpu.load_and_run(vec![0x94, 0x43, 0x00]);
+    assert_eq!(cpu.mem_read(0x004a), 10);
+}
+
+#[test]
+fn test_sty_0x8c() {
+    let mut cpu = CPU::new();
+    cpu.register_y = 10;
+
+    cpu.load_and_run(vec![0x8c, 0x00, 0x01, 0x00]);
+    assert_eq!(cpu.mem_read(0x0100), 10);
+}
