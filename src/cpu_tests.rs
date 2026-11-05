@@ -280,3 +280,39 @@ fn test_sta_0x9d() {
     cpu.load_and_run(vec![0x9d, 0x40, 0x00, 0x00]);
     assert_eq!(cpu.mem_read(0x0045), 10);
 }
+
+#[test]
+fn test_sta_0x99() {
+    let mut cpu = CPU::new();
+    cpu.register_a = 10;
+    cpu.register_y = 7;
+
+    cpu.load_and_run(vec![0x99, 0x40, 0x00, 0x00]);
+    assert_eq!(cpu.mem_read(0x0047), 10);
+}
+
+#[test]
+fn test_sta_0x81() {
+    let mut cpu = CPU::new();
+    cpu.register_a = 10;
+    cpu.register_x = 5;
+
+    cpu.mem_write(0x25, 0x00);
+    cpu.mem_write(0x26, 0x01);
+
+    cpu.load_and_run(vec![0x81, 0x20, 0x00]);
+    assert_eq!(cpu.mem_read(0x0100), 10);
+}
+
+#[test]
+fn test_sta_0x91() {
+    let mut cpu = CPU::new();
+    cpu.register_a = 10;
+    cpu.register_y = 5;
+
+    cpu.mem_write(0x20, 0x00);
+    cpu.mem_write(0x21, 0x01);
+
+    cpu.load_and_run(vec![0x91, 0x20, 0x00]);
+    assert_eq!(cpu.mem_read(0x0105), 10);
+}
