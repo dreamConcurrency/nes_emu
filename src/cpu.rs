@@ -485,6 +485,24 @@ impl CPU {
         data
     }
 
+    fn pla(&mut self) {
+        let data = self.stack_pop();
+        self.set_register_a(data);
+    }
+
+    fn plp(&mut self) {
+        self.status.bits = self.stack_pop();
+        self.status.remove(Cpu::Flags::BREAK);
+        self.status.insert(Cpu::Flags::BREAK2);
+    }
+
+    fn php(&mut self) {
+        let mut flags = self.status.clone();
+        flags.insert(Cpu::Flags::BREAK);
+        flags.insert(Cpu::Flags::BREAK2);
+        self.stack_push(flags.bits());
+    }
+
     fn compare(&mut self, mode: &AddressingMode, compare_with: u8) {
         let addr = self.get_operand_adress(mode);
         let data = self.mem_read(addr);
@@ -652,6 +670,21 @@ impl CPU {
                 /* PHA */ 
                 0x48 => {
                     self.stack_push(self.regsiter_a);
+                }
+
+                /* PLA */ 
+                0x68 => {
+                    self.pla();
+                }
+
+                /* PHP */
+                0x08 => {
+                    self.php();
+                }
+
+                /* PLP */ 
+                0x28 => {
+                    self.plp();
                 }
                 
                 /* TXS */
