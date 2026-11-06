@@ -517,6 +517,7 @@ fn test_lda_0xbd_zero_flag() {
 
     cpu.load_and_run(vec![0xbd, 0x50, 0x00]);
     assert_eq!(cpu.register_a, 0);
+    assert!(cpu.status.bits() & 0b0000_0010 != 0);
 }
 
 #[test]
@@ -528,6 +529,7 @@ fn test_lda_0xbd_negative_flag() {
 
     cpu.load_and_run(vec![0xbd, 0x50, 0x00]);
     assert_eq!(cpu.register_a, 128);
+    assert!(cpu.status.bits() & 0b1000_0000 != 0);
 }
 
 #[test]
@@ -550,6 +552,7 @@ fn test_lda_0xb9_zero_flag() {
 
     cpu.load_and_run(vec![0xbd, 0x50, 0x00]);
     assert_eq!(cpu.register_a, 0);
+    assert!(cpu.status.bits() & 0b0000_0010 != 0);
 }
 
 #[test]
@@ -561,6 +564,7 @@ fn test_lda_0xb9_negative_flag() {
 
     cpu.load_and_run(vec![0xb9, 0x50, 0x00]);
     assert_eq!(cpu.register_a, 128);
+    assert!(cpu.status.bits() & 0b1000_0000 != 0);
 }
 
 #[test]
@@ -589,6 +593,7 @@ fn test_lda_0xa1_zero_flag() {
 
     cpu.load_and_run(vec![0xa1, 0x20, 0x00]);
     assert_eq!(cpu.register_a, 0);
+    assert!(cpu.status.bits() & 0b0000_0010 != 0);
 }
 
 #[test]
@@ -603,6 +608,7 @@ fn test_lda_0xa1_negative_flag() {
 
     cpu.load_and_run(vec![0xa1, 0x20, 0x00]);
     assert_eq!(cpu.register_a, 128);
+    assert!(cpu.status.bits() & 0b1000_0000 != 0);
 }
 
 #[test]
@@ -631,6 +637,7 @@ fn test_lda_0xb1_zero_flag() {
 
     cpu.load_and_run(vec![0xb1, 0x25, 0x00]);
     assert_eq!(cpu.register_a, 0);
+    assert!(cpu.status.bits() & 0b0000_0010 != 0);
 }
 
 #[test]
@@ -645,6 +652,7 @@ fn test_lda_0xb1_negative_flag() {
 
     cpu.load_and_run(vec![0xb1, 0x25, 0x00]);
     assert_eq!(cpu.register_a, 128);
+    assert!(cpu.status.bits() & 0b1000_0000 != 0);
 }
 
 /* LDX */
@@ -817,4 +825,12 @@ fn test_ldx_0xbe_negative_flag() {
     assert!(cpu.status.bits() & 0b1000_0000 != 0);
 }
 
+/* LDY */
+#[test]
+fn test_ldy_0xa0() {
+   let mut cpu = CPU::new();
 
+   cpu.load_and_run(vec![0xa0, 0x05, 0x00]);
+
+   assert_eq!(cpu.register_y, 5);
+}
