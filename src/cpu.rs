@@ -216,7 +216,7 @@ impl CPU {
         let hi = (data >> 8) as u8;
         let lo = (data & 0xff) as u8;
         self.stack_push(hi);
-        self.stack_push(low);
+        self.stack_push(lo);
     }
 
     fn stack_pop_u16(&mut self) -> u16 {
@@ -492,14 +492,13 @@ impl CPU {
 
     fn plp(&mut self) {
         self.status.bits = self.stack_pop();
-        self.status.remove(Cpu::Flags::BREAK);
-        self.status.insert(Cpu::Flags::BREAK2);
+        self.status.remove(CpuFlags::BREAK2);
     }
 
     fn php(&mut self) {
         let mut flags = self.status.clone();
-        flags.insert(Cpu::Flags::BREAK);
-        flags.insert(Cpu::Flags::BREAK2);
+        flags.insert(CpuFlags::BREAK);
+        flags.insert(CpuFlags::BREAK2);
         self.stack_push(flags.bits());
     }
 
@@ -669,7 +668,7 @@ impl CPU {
 
                 /* PHA */ 
                 0x48 => {
-                    self.stack_push(self.regsiter_a);
+                    self.stack_push(self.register_a);
                 }
 
                 /* PLA */ 
@@ -689,12 +688,12 @@ impl CPU {
                 
                 /* TXS */
                 0x9a => {
-                    self.stack_pointer = register_x;
+                    self.stack_pointer = self.register_x;
                 },
 
                 /* TSX */ 
                 0xba => {
-                    self.register_x = stack_pointer;
+                    self.register_x = self.stack_pointer;
                     self.update_zero_and_negative_flags(self.register_x);
                 }
 
