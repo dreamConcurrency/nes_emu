@@ -649,6 +649,22 @@ impl CPU {
                     self.ror(&opcode.mode);
                 }
 
+                /* PHA */ 
+                0x48 => {
+                    self.stack_push(self.regsiter_a);
+                }
+                
+                /* TXS */
+                0x9a => {
+                    self.stack_pointer = register_x;
+                },
+
+                /* TSX */ 
+                0xba => {
+                    self.register_x = stack_pointer;
+                    self.update_zero_and_negative_flags(self.register_x);
+                }
+
                 0xAA => self.tax(),
                 0x8a => self.txa(),
                 0xe8 => self.inx(),
