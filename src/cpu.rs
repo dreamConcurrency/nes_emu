@@ -708,6 +708,20 @@ impl CPU {
                     self.update_zero_and_negative_flags(self.register_x);
                 }
 
+                /* RTS */ 
+                0x60 => {
+                    self.program_counter = self.stack_pop_u16() + 1;
+                }
+
+                /* RTI */
+                0x40 => {
+                    self.status.bits = self.stack_pop();
+                    self.status.remove(CpuFlags::BREAK);
+                    self.status.insert(CpuFlags::BREAK2);
+
+                    self.program_counter = self.stack_pop_u16();
+                }
+
                 0xAA => self.tax(),
                 0x8a => self.txa(),
                 0xe8 => self.inx(),
