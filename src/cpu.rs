@@ -364,6 +364,32 @@ impl CPU {
         data
     }
 
+    fn bit(&mut self, mode: &AddressingMode) {
+        let addr = self.get_operand_adress(mode);
+        let data = self.mem_read(addr);
+        let and = self.register_a & data;
+        if and == 0 {
+            self.status.insert(CpuFlags::ZERO);
+        } else {
+            self.status.remove(CpuFlags::ZERO);
+        }
+
+        self.status.set(CpuFlags::NEGATIV, data & 0b10000000 > 0);
+        self.status.set(CpuFlags::OVERFLOW, data & 0b01000000 > 0);
+    }
+
+    fn branch(&mut self, condition: bool) {
+        if condition {
+            let jump: i8 = self.mem_read(self.program_counter) as i8;
+            let jump_addr = self
+                .program_counter
+                .wrapping_add(1)
+                .wrapping_add(jump as u16);
+
+            self.program_counter = jump_addr;
+        }
+    }
+
     fn adc(&mut self, mode: &AddressingMode) {
         let addr = self.get_operand_adress(&mode);
         let value = self.mem_read(addr);
@@ -647,6 +673,51 @@ impl CPU {
                 /* CPY */
                 0xc0 | 0xc4 | 0xcc => {
                     self.compare(&opcode.mode, self.register_y);
+                }
+
+                /* BNE */
+                0xd0 => {
+                    self.branch(!self.status.contains(CpuFlags::ZERO));
+                }
+
+                /* BVS */
+                0x70 => {
+                    self.branch(self.status.contains(CpuFlags::OVERFLOW));
+                }
+
+                /* BVC */
+                0x50 => {
+                    self.branch(!self.status.contains(CpuFlags::OVERFLOW));
+                }
+
+                /* BPL */
+                0x10 => {
+                    self.branch(!self.status.contains(CpuFlags::NEGATIV));
+                }
+
+                /* BMI */
+                0x30 => {
+                    self.branch(self.status.contains(CpuFlags::NEGATIV));
+                }
+
+                /* BEQ */
+                0xf0 => {
+                    self.branch(self.status.contains(CpuFlags::ZERO));
+                }
+
+                /* BCS */
+                0xb0 => {
+                    self.branch(self.status.contains(CpuFlags::CARRY));
+                }
+
+                /* BCC */
+                0x90 => {
+                    self.branch(!self.status.contains(CpuFlags::CARRY));
+                }
+
+                /* BIT */ 
+                0x24 | 0x2c => {
+                    self.bit(&opcode.mode);
                 }
                 
                 /* JMP Indirect */
