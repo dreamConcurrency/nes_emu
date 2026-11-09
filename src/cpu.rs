@@ -648,6 +648,34 @@ impl CPU {
                 0xc0 | 0xc4 | 0xcc => {
                     self.compare(&opcode.mode, self.register_y);
                 }
+                
+                /* JMP Indirect */
+                0x4c => {
+                    let mem_address = self.mem_read_u16(self.program_counter);
+                    self.program_counter = mem_address;
+                }
+
+                /* JMP Absolute */ 
+                0x6c => {
+                    let mem_address = self.mem_read_u16(self.program_counter);
+
+                    let indirect_ref = if mem_address & 0x00FF == 0x00FF {
+                        let lo = self.mem_read(mem_address);
+                        let hi = self.mem_read(mem_address & 0xFF00);
+                        (hi as u16) << 8 | (lo as u16)
+                    } else {
+                        self.mem_read_u16(mem_address)
+                    };
+
+                    self.program_counter = indirect_ref;
+                }
+
+                /* JSR */ 
+                0x20 => {
+                    self.stack_push_u16(self.program_counter + 2 - 1);
+                    let target_address = self.mem_read_u16(self.program_counter);
+                    self.program_counter = target_address;
+                }
 
                 /* ASL */
                 0x0a => self.asl_accumulator(),
@@ -720,6 +748,11 @@ impl CPU {
                     self.status.insert(CpuFlags::BREAK2);
 
                     self.program_counter = self.stack_pop_u16();
+                }
+
+                /* NOP */ 
+                0xea => {
+                    // do nothing
                 }
 
                 0xAA => self.tax(),
