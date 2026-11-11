@@ -1,5 +1,6 @@
 use crate::opcodes;
 use std::collections::HashMap;
+use crate::bus::Bus;
 
 bitflags! {
     pub struct CpuFlags: u8 {
@@ -24,7 +25,7 @@ pub struct CPU {
     pub status: CpuFlags,
     pub program_counter: u16,
     pub stack_pointer: u8,
-    memory: [u8; 0xFFFF],
+    pub bus: Bus,
 }
 
 #[derive(Debug)]
@@ -63,16 +64,24 @@ pub trait Mem {
 
 impl Mem for CPU {
     fn mem_read(&self, addr: u16) -> u8 {
-        self.memory[addr as usize]
+        self.bus.mem_read(addr)
     }
 
     fn mem_write(&mut self, addr: u16, data: u8) {
-        self.memory[addr as usize] = data;
+        self.bus.mem_write(addr, data)
+    }
+
+    fn mem_read_u16(&self, pos: u16) -> u16 {
+        self.bus.mem_read_u16(pos)
+    }
+
+    fn mem_write_u16(&mut self, pos: u16, data: u16) {
+        self.bus.mem_write_u16(pos, data)
     }
 }
 
 impl CPU {
-    pub fn new() -> Self {
+    pub fn new(bus: Bus) -> Self {
         CPU {
             register_a: 0,
             register_x: 0,
@@ -80,7 +89,7 @@ impl CPU {
             stack_pointer: STACK_RESET,
             status: CpuFlags::from_bits_truncate(0b100100),
             program_counter: 0,
-            memory: [0; 0xFFFF],
+            bus: bus,
         }
     }
 
@@ -148,7 +157,9 @@ impl CPU {
     }
 
     pub fn load(&mut self, program: Vec<u8>) {
-        self.memory[0x600..(0x600 + program.len())].copy_from_slice(&program[..]);
+        for i in 0..(program.len() as u16) {
+            self.mem_write(0x0000 + i, program[i as usize]);
+        }
         self.mem_write_u16(0xFFFC, 0x8000);
     }
 
@@ -275,7 +286,7 @@ impl CPU {
         if data & 1 == 1 {
             self.set_carry_flag();
         } else {
-    self.clear_carry_flag();
+            self.clear_carry_flag();
         }
 
         data = data >> 1;
@@ -565,7 +576,10 @@ impl CPU {
         self.run_with_callback(|_| {});
     }
 
-    pub fn run_with_callback<F>(&mut self, mut callback: F) where F: FnMut(&mut CPU) {
+    pub fn run_with_callback<F>(&mut self, mut callback: F)
+    where
+        F: FnMut(&mut CPU),
+    {
         let ref opcodes: HashMap<u8, &'static opcodes::OpCode> = *opcodes::OPCODES_MAP;
 
         loop {
@@ -583,25 +597,25 @@ impl CPU {
                     self.adc(&opcode.mode);
                 }
 
-                /* CLC */ 
+                /* CLC */
                 0x18 => self.clear_carry_flag(),
 
-                /* SEC */ 
+                /* SEC */
                 0x38 => self.set_carry_flag(),
 
-                /* CLI */ 
+                /* CLI */
                 0x58 => self.status.remove(CpuFlags::INTERRUPT_DISABLE),
 
-                /* SEI */ 
+                /* SEI */
                 0x78 => self.status.insert(CpuFlags::INTERRUPT_DISABLE),
-                
-                /* CLV */ 
+
+                /* CLV */
                 0xb8 => self.status.remove(CpuFlags::OVERFLOW),
 
-                /* CLD */ 
+                /* CLD */
                 0xd8 => self.status.remove(CpuFlags::DECIMAL_MODE),
 
-                /* SED */ 
+                /* SED */
                 0xf8 => self.status.insert(CpuFlags::DECIMAL_MODE),
 
                 /* AND */
@@ -634,7 +648,7 @@ impl CPU {
                     self.ldy(&opcode.mode);
                 }
 
-                /* SBC */ 
+                /* SBC */
                 0xe9 | 0xe5 | 0xf5 | 0xed | 0xfd | 0xf9 | 0xe1 | 0xf1 => {
                     self.sbc(&opcode.mode);
                 }
@@ -719,18 +733,18 @@ impl CPU {
                     self.branch(!self.status.contains(CpuFlags::CARRY));
                 }
 
-                /* BIT */ 
+                /* BIT */
                 0x24 | 0x2c => {
                     self.bit(&opcode.mode);
                 }
-                
+
                 /* JMP Indirect */
                 0x4c => {
                     let mem_address = self.mem_read_u16(self.program_counter);
                     self.program_counter = mem_address;
                 }
 
-                /* JMP Absolute */ 
+                /* JMP Absolute */
                 0x6c => {
                     let mem_address = self.mem_read_u16(self.program_counter);
 
@@ -745,7 +759,7 @@ impl CPU {
                     self.program_counter = indirect_ref;
                 }
 
-                /* JSR */ 
+                /* JSR */
                 0x20 => {
                     self.stack_push_u16(self.program_counter + 2 - 1);
                     let target_address = self.mem_read_u16(self.program_counter);
@@ -766,7 +780,7 @@ impl CPU {
                     self.lsr(&opcode.mode);
                 }
 
-                /* ROL */ 
+                /* ROL */
                 0x2a => self.rol_accumulator(),
 
                 0x26 | 0x36 | 0x2e | 0x3e => {
@@ -780,12 +794,12 @@ impl CPU {
                     self.ror(&opcode.mode);
                 }
 
-                /* PHA */ 
+                /* PHA */
                 0x48 => {
                     self.stack_push(self.register_a);
                 }
 
-                /* PLA */ 
+                /* PLA */
                 0x68 => {
                     self.pla();
                 }
@@ -795,23 +809,23 @@ impl CPU {
                     self.php();
                 }
 
-                /* PLP */ 
+                /* PLP */
                 0x28 => {
                     self.plp();
                 }
-                
+
                 /* TXS */
                 0x9a => {
                     self.stack_pointer = self.register_x;
-                },
+                }
 
-                /* TSX */ 
+                /* TSX */
                 0xba => {
                     self.register_x = self.stack_pointer;
                     self.update_zero_and_negative_flags(self.register_x);
                 }
 
-                /* RTS */ 
+                /* RTS */
                 0x60 => {
                     self.program_counter = self.stack_pop_u16() + 1;
                 }
@@ -825,7 +839,7 @@ impl CPU {
                     self.program_counter = self.stack_pop_u16();
                 }
 
-                /* NOP */ 
+                /* NOP */
                 0xea => {
                     // do nothing
                 }
