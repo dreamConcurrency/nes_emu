@@ -1,6 +1,6 @@
+use crate::bus::Bus;
 use crate::opcodes;
 use std::collections::HashMap;
-use crate::bus::Bus;
 
 bitflags! {
     pub struct CpuFlags: u8 {
@@ -90,6 +90,58 @@ impl CPU {
             status: CpuFlags::from_bits_truncate(0b100100),
             program_counter: 0,
             bus: bus,
+        }
+    }
+
+    pub fn get_absolute_address(&self, mode: &AddressingMode, addr: u16) -> u16 {
+        match mode {
+            AddressingMode::ZeroPage => self.mem_read(addr) as u16,
+
+            AddressingMode::Absolute => self.mem_read_u16(addr),
+
+            AddressingMode::ZeroPage_X => {
+                let pos = self.mem_read(addr);
+                let addr = pos.wrapping_add(self.register_x) as u16;
+                addr
+            }
+            AddressingMode::ZeroPage_Y => {
+                let pos = self.mem_read(addr);
+                let addr = pos.wrapping_add(self.register_y) as u16;
+                addr
+            }
+
+            AddressingMode::Absolute_X => {
+                let base = self.mem_read_u16(addr);
+                let addr = base.wrapping_add(self.register_x as u16);
+                addr
+            }
+            AddressingMode::Absolute_Y => {
+                let base = self.mem_read_u16(addr);
+                let addr = base.wrapping_add(self.register_y as u16);
+                addr
+            }
+
+            AddressingMode::Indirect_X => {
+                let base = self.mem_read(addr);
+
+                let ptr: u8 = (base as u8).wrapping_add(self.register_x);
+                let lo = self.mem_read(ptr as u16);
+                let hi = self.mem_read(ptr.wrapping_add(1) as u16);
+                (hi as u16) << 8 | (lo as u16)
+            }
+            AddressingMode::Indirect_Y => {
+                let base = self.mem_read(addr);
+
+                let lo = self.mem_read(base as u16);
+                let hi = self.mem_read((base as u8).wrapping_add(1) as u16);
+                let deref_base = (hi as u16) << 8 | (lo as u16);
+                let deref = deref_base.wrapping_add(self.register_y as u16);
+                deref
+            }
+
+            _ => {
+                panic!("mode {:?} is not supported", mode);
+            }
         }
     }
 

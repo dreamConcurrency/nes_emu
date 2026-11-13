@@ -11,3 +11,7 @@ Cargo.lock.log
 *.njsproj
 *.sln
 *.swp
+
+.DS_Store
+
+*.log
