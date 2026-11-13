@@ -104,7 +104,7 @@ impl PPU for NesPPU {
     }
 
     fn write_to_scroll(&mut self, value: u8) {
-        self.addr.update(value);
+        self.scroll.write(value);
     }
 
     fn read_oam_data(&self) -> u8 {
