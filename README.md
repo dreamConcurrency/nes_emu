@@ -7,9 +7,12 @@ You can play Snake! This game was written in Assembly and demostrate that our pr
 2026-11-11
 I implemented Bus,Cartrdge parser. You can run Snake with funkier physics.
 
+2026-11-17
+I implemented PPU. You can run Pac-man, Donkey Kong but you can't play it because I have to implement joypad emulation.
+
 TODO 
 - [done] Bus
-- [ ] PPU
-- [ ] APU
-- [ ] Mappers for others games
+- [done] PPU (without scroling)
+- [ ] Joypad emulation
+- [ ] PPU scroling
 
