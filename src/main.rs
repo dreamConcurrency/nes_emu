@@ -9,7 +9,6 @@ use bus::Bus;
 use cartridge::Rom;
 use cpu::CPU;
 use render::frame::Frame;
-use render::palette;
 use ppu::NesPPU;
 
 use sdl2::event::Event;

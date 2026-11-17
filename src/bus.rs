@@ -128,6 +128,28 @@ impl Mem for Bus<'_> {
                 self.ppu.write_to_data(data);
             }
 
+            0x4000..=0x4013 | 0x4015 => {
+                //ignore APU 
+            }
+
+            0x4016 => {
+                // ignore joypad 1;
+            }
+
+            0x4017 => {
+                // ignore joypad 2;
+            }
+
+            0x4014 => {
+                let mut buffer: [u8; 256] = [0; 256];
+                let hi: u16 = (data as u16) << 8;
+                for i in 0..256u16 {
+                    buffer[i as usize] = self.mem_read(hi + i);
+                }
+
+                self.ppu.write_oam_dma(&buffer);
+            }
+
             0x2008..=PPU_REGISTERS_MIRRORS_END => {
                 let mirror_down_addr = addr & 0b00100000_00000111;
                 self.mem_write(mirror_down_addr, data);
