@@ -1,21 +1,24 @@
 pub mod bus;
 pub mod cartridge;
 pub mod cpu;
+pub mod joypad;
 pub mod opcodes;
 pub mod ppu;
 pub mod render;
-pub mod joypad;
 
 use bus::Bus;
 use cartridge::Rom;
 use cpu::CPU;
-use render::frame::Frame;
 use ppu::NesPPU;
+use render::frame::Frame;
 
 use sdl2::event::Event;
 use sdl2::keyboard::Keycode;
 use sdl2::pixels::PixelFormatEnum;
 use std::collections::HashMap;
+use std::env;
+use std::path::Path;
+use std::time::{Duration, Instant};
 
 #[macro_use]
 extern crate lazy_static;
@@ -35,7 +38,7 @@ fn main() {
         .build()
         .unwrap();
 
-    let mut canvas = window.into_canvas().present_vsync().build().unwrap();
+    let mut canvas = window.into_canvas().build().unwrap();
     let mut event_pump = sdl_context.event_pump().unwrap();
     canvas.set_scale(3.0, 3.0).unwrap();
 
@@ -44,8 +47,20 @@ fn main() {
         .create_texture_target(PixelFormatEnum::RGB24, 256, 240)
         .unwrap();
 
+    let args: Vec<String> = env::args().collect();
+    if args.len() < 2 {
+        eprintln!("Использование: cargo run -- <имя_игры.nes>");
+        std::process::exit(1);
+    }
+
+    let rom_path = if Path::new(&args[1]).exists() {
+        args[1].clone()
+    } else {
+        format!("roms/{}", args[1])
+    };
+
     //load the game
-    let bytes: Vec<u8> = std::fs::read("ice.nes").unwrap();
+    let bytes: Vec<u8> = std::fs::read(&rom_path).unwrap_or_else(|_| panic!("Failed to open ROM file: {}", rom_path));;
     let rom = Rom::new(&bytes).unwrap();
 
     let mut frame = Frame::new();
@@ -57,10 +72,13 @@ fn main() {
     key_map.insert(Keycode::Left, joypad::JoypadButton::LEFT);
     key_map.insert(Keycode::Space, joypad::JoypadButton::SELECT);
     key_map.insert(Keycode::Return, joypad::JoypadButton::START);
-    key_map.insert(Keycode::A, joypad::JoypadButton::BUTTON_A);
-    key_map.insert(Keycode::S, joypad::JoypadButton::BUTTON_B);
+    key_map.insert(Keycode::Z, joypad::JoypadButton::BUTTON_A);
+    key_map.insert(Keycode::X, joypad::JoypadButton::BUTTON_B);
 
     // run the game cycle
+    let target_frame_duration = Duration::from_secs_f64(1.0 / 60.0);
+    let mut last_frame = Instant::now();
+
     let bus = Bus::new(rom, move |ppu: &NesPPU, joypad: &mut joypad::Joypad| {
         render::render(ppu, &mut frame);
         texture.update(None, &frame.data, 256 * 3).unwrap();
@@ -89,6 +107,12 @@ fn main() {
                 _ => { /* do nothing */ }
             }
         }
+
+        let elapsed = last_frame.elapsed();
+        if elapsed < target_frame_duration {
+            std::thread::sleep(target_frame_duration - elapsed);
+        }
+        last_frame = Instant::now();
     });
 
     let mut cpu = CPU::new(bus);
