@@ -1,18 +1,45 @@
-NES emulator written in Rust!
+##NES emulator written in Rust!
 
----
-2026-11-09
-You can play Snake! This game was written in Assembly and demostrate that our processor works.
+That's my second emulator what was written in Rust. That's an educational project I wrote this one using Rafael Baguzman book.
+P.S. Thank you for this book, Rafael!
 
-2026-11-11
-I implemented Bus,Cartrdge parser. You can run Snake with funkier physics.
+###Screenshots
+<img width="350" height="350" alt="image" src="https://github.com/user-attachments/assets/89d6a94d-2891-414c-9f26-1bb5b1f306b7" />
+<img width="350" height="350" alt="image" src="https://github.com/user-attachments/assets/4c86d371-dae7-4807-a467-ffc06c21ee15" />
 
-2026-11-17
-I implemented PPU. You can run Pac-man, Donkey Kong but you can't play it because I have to implement joypad emulation.
+###What kind of game you can play?
 
-TODO 
-- [done] Bus
-- [done] PPU (without scroling)
-- [ ] Joypad emulation
-- [ ] PPU scroling
+You can play classic games what was created in earlier 80x. If you see that games more than 40kb, you should find another emulator.
+
+###How to play?
+
+You should create a folder in root of project and add to this folder some ROMs.
+
+After that use this command and enjoy of playing NES games on your computer!
+
+```bash
+cargo run --release --name_of_your_rom.nes
+```
+
+###Controls
+
+z/x - a/b
+space - select
+return - start
+arrows - up/down/left/right
+
+
+###What I learned and what's next?
+
+I fell in love with Rust and creating emulators, after this project. I didn't implement APU, mappers for different games, decent UI, but I got knowledge that'll help me keep going and create something really cool in future!
+
+I'm going to get deeper in system programming and after that re-create NES emulator using this knowledge.
+
+###What was hard and what was easy?
+
+Creating a CPU was very interesting and pretty logical for me. I almost wrote all opcodes by myself and even make a mistake trying to write all tests for every opcode and flag by myself:D.
+Creating a PPU was a hell of a task. I don't completely understand each piece of code, even now. Thankfully, I understand now, that I more CPU-person than PPU, if you know what i mean.
+
+So, implementing APU is something from extraterrestrial technologies for me, but I promise myself that I'll learn about it.
+
 
