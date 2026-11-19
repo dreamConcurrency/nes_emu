@@ -1,6 +1,6 @@
 ## 🎮NES emulator written in Rust!
 
-That's my second emulator what was written in Rust. That's an educational project I wrote this one using Rafael Baguzman book.
+That's my second emulator that was written in Rust. That's an educational project I wrote this one using Rafael Baguzman book.
 P.S. Thank you for this book, Rafael!
 
 ---
@@ -12,7 +12,7 @@ P.S. Thank you for this book, Rafael!
 ---
 ### 🕹️What kind of game you can play?
 
-You can play classic games what was created in earlier 80x. If you see that games more than 40kb, you should find another emulator.
+You can play classic games what was created early 80s. If you see that games more than 40kb, you should find another emulator.
 
 ---
 
