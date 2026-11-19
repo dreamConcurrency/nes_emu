@@ -18,9 +18,8 @@ You can play classic games what was created in earlier 80x. If you see that game
 
 ### 🚀How to play?
 
-You should create a folder in root of project and add to this folder some ROMs.
-
-After that use this command and enjoy of playing NES games on your computer!
+1. Create a folder in the root directory of the project and put your `.nes` ROM files inside.
+2. Run this following command and enjoy NES games on your computer!
 
 ```bash
 cargo run --release --name_of_your_rom.nes
